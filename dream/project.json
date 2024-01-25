@@ -1,0 +1,10 @@
+{
+    "name": "BlitBall",
+    "target": "amiga",
+    "source": {
+        "name": "blitball"
+    },
+    "build": {
+        "name": "blitball"
+    }
+}

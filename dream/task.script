@@ -1,0 +1,5 @@
+[build]
+js2amos {source_name}.ts src/ src/{source_name}.asc
+
+[run]
+open -a fs-uae fs-uae/config.fs-uae
