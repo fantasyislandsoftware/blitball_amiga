@@ -59,10 +59,6 @@ priority on
 
 screen show 0
 
-procedure tile[x,y,z]
-    if (x < 0 or y < 0 or z < 0 or x > 7 or y > 2 or z > 7) then t = 0 else t = map(x,y,z)
-end proc[t]
-
 procedure idle[p]
     for i = 0 to p
     next i
@@ -72,58 +68,20 @@ do
 
     for i = 0 to actorCount - 2
 
-        iso2x[actor3Dx(i),actor3Dy(i),actor3Dz(i)]
+        iso2x[actor3Dx(i),actor3Dy(i),actor3Dz(i),mx]
         xx = param
-        iso2y[actor3Dx(i),actor3Dy(i),actor3Dz(i)]
+        iso2y[actor3Dx(i),actor3Dy(i),actor3Dz(i),my]
         yy = param
 
         screen 1
         cls 0
         put block blkEntPtr,0,0
 
-        tile[actor3Dx(i),actor3Dy(i),actor3Dz(i)+1]
-        t = param
-        if t > 1 then put block t,-18,9
-        tile[actor3Dx(i)+1,actor3Dy(i),actor3Dz(i)+1]
-        t = param
-        if t > 1 then put block t,0,18
-        tile[actor3Dx(i)+2,actor3Dy(i),actor3Dz(i)+1]
-        t = param
-        if t > 1 then put block t,18,27
-
-        rem tile[actor3Dx(i),actor3Dy(i)+1,actor3Dz(i)+1]
-        rem t = param
-        rem if t > 1 then put block t,-18,-9
-        rem tile[actor3Dx(i)+1,actor3Dy(i)+1,actor3Dz(i)+1]
-        rem t = param
-        rem if t > 1 then put block t,0,0
-        rem tile[actor3Dx(i)+2,actor3Dy(i)+1,actor3Dz(i)+1]
-        rem t = param
-        rem if t > 1 then put block t,18,9
-        rem tile[actor3Dx(i)+3,actor3Dy(i)+1,actor3Dz(i)+1]
-        rem t = param
-        rem if t > 1 then put block t,36,18
-
-        dx = -18
-        dy = 9
-        for iy = 0 to 2
-            for ix = 0 to 3
-                tile[actor3Dx(i)+ix,actor3Dy(i)+iy,actor3Dz(i)+1]
-                t = param
-                if t > 1 then put block t,dx,dy
-                dx = dx + 18
-                dy = dy + 9
-            next ix
-            dx = -18
-            dy = -9
-        next iy
+        drwClpMap[actor3Dx(i),actor3Dy(i),actor3Dz(i)]
 
         get bob 1,0,0 to tw,th
         screen 0
         bob i,xx,yy,actorType(i)+1
-
-        rem locate 0,0
-        rem print t
 
     next i
 
