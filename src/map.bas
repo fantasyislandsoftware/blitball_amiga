@@ -37,16 +37,18 @@ end proc
 procedure initMapData
     clearMapData
     basicFloor
-    southWall
-    westWall
+    rem southWall
+    rem westWall
 end proc
 
-procedure iso2x[x,y,z,ox]
-    xx = x * 18 - z * 18 + ox
+procedure iso2x[gx,gy,gz,px,py,pz,ox]
+    grid = (gx * 18) - (gz * 18)
+    xx = grid + px - pz + ox
 end proc[xx]
 
-procedure iso2y[x,y,z,oy]
-    yy = x * 9 - y * 18 + z * 9 + oy
+procedure iso2y[gx,gy,gz,px,py,pz,oy]
+    grid = (gx * 9) - (gy * 18) + (gz * 9)
+    yy = grid + (px / 2) + (pz / 2) + oy
 end proc[yy]
 
 procedure drwMap    
@@ -55,9 +57,9 @@ procedure drwMap
             for x = 0 to 7
                 t = map(x, y, z)
                 if (t > 0)
-                    iso2x[x,y,z,mx]
+                    iso2x[x,y,z,0,0,0,mx]
                     xx = param
-                    iso2y[x,y,z,my]
+                    iso2y[x,y,z,0,0,0,my]
                     yy = param
                     put block t, xx, yy
                 end if
@@ -70,16 +72,16 @@ procedure tile[x,y,z]
     if (x < 0 or y < 0 or z < 0 or x > 7 or y > 2 or z > 7) then t = 0 else t = map(x,y,z)
 end proc[t]
 
-procedure drwClpMap[px,py,pz]
+procedure drwClpMap[gx,gy,gz]
     for z = 0 to 4
         for y = 0 to 2
             for x = 0 to 4
-                tile[x + px, y + py, z + pz]
+                tile[x + gx, y + gy, z + gz]
                 t = param
                 if (t > 1)
-                    iso2x[x, y, z, 0]
+                    iso2x[x, y, z, 0, 0, 0, 0]
                     xx = param
-                    iso2y[x, y, z, 0]
+                    iso2y[x, y, z, 0, 0, 0, 0]
                     yy = param
                     put block t, xx, yy
                 end if
