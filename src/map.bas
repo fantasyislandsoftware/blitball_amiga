@@ -17,7 +17,7 @@ procedure basicFloor
 end proc
 
 procedure southWall
-    for y = 0 to 2
+    for y = 0 to 1
         for x = 0 to 7
             map(x, y, 7) = 2
         next x
@@ -37,8 +37,8 @@ end proc
 procedure initMapData
     clearMapData
     basicFloor
-    rem southWall
-    rem westWall
+    southWall
+    westWall
 end proc
 
 procedure iso2x[gx,gy,gz,px,py,pz,ox]
@@ -72,16 +72,20 @@ procedure tile[x,y,z]
     if (x < 0 or y < 0 or z < 0 or x > 7 or y > 2 or z > 7) then t = 0 else t = map(x,y,z)
 end proc[t]
 
-procedure drwClpMap[gx,gy,gz]
-    for z = 0 to 4
+procedure drwClpMap[gx,gy,gz,px,py,pz]
+    ox = 0
+    if (px < 0) then ox = -1
+    oz = 0
+    if (pz < 0) then oz = -1
+    for z = oz to 4
         for y = 0 to 2
-            for x = 0 to 4
+            for x = ox to 4
                 tile[x + gx, y + gy, z + gz]
                 t = param
                 if (t > 1)
-                    iso2x[x, y, z, 0, 0, 0, 0]
+                    iso2x[x, y, z, -px, -py, -pz, 0]
                     xx = param
-                    iso2y[x, y, z, 0, 0, 0, 0]
+                    iso2y[x, y, z, -px, -py, -pz, 0]
                     yy = param
                     put block t, xx, yy
                 end if

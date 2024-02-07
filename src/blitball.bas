@@ -28,7 +28,7 @@ rem Player
 actorType(0) = 0
 actor3Dgx(0) = 1
 actor3Dgy(0) = 0
-actor3Dgz(0) = 1
+actor3Dgz(0) = 6
 actor3Dpx(0) = 0
 actor3Dpy(0) = 0
 actor3Dpz(0) = 0
@@ -84,7 +84,7 @@ do
         cls 0
         put block blkEntPtr,0,0
 
-        drwClpMap[actor3Dgx(i),actor3Dgy(i),actor3Dgz(i)]
+        drwClpMap[actor3Dgx(i), actor3Dgy(i), actor3Dgz(i), actor3Dpx(i), actor3Dpy(i), actor3Dpz(i)]
 
         get bob 1,0,0 to tw,th
         screen 0
