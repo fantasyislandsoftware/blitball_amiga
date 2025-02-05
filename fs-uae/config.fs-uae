@@ -1,11 +1,11 @@
 [fs-uae]
-amiga_model = A600
-chip_memory = 2048
-cpu = 68060
+amiga_model = A1200
+chip_memory = 8192
+cpu = 68040
 floppy_drive_0_sounds = off
 floppy_drive_speed = 0
 uaem_write_flags = 0
 joystick_port_1 = nothing
-hard_drive_0 = /Users/andyjones/Documents/Projects/source/dreams/blitball_amiga/fs-uae/hd
+hard_drive_0 = dev_system
 hard_drive_1 = /Users/andyjones/Documents/Projects/source/dreams/blitball_amiga/src
-kickstart_file = Kickstart v2.05 r37.299 (1991)(Commodore)(A600)[!].rom
+kickstart_file = Kickstart v3.1 r40.68 (1993)(Commodore)(A1200)[!].rom

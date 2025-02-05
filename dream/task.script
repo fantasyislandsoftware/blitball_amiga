@@ -1,5 +1,2 @@
-[build]
-concatBasic {source_name}.bas src/ src/{source_name}.asc
-
 [run]
 open -a fs-uae fs-uae/config.fs-uae
