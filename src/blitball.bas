@@ -21,17 +21,31 @@ global MAP_D, MAP_H, MAP_SCREEN_X, MAP_SCREEN_Y, map()
 REM [i], [gx, gy, gz, px, py, pz, d, imageIndex]
 actor_max = 100
 actor_count = 0
-dim actor(actor_max, 9)
-ACTOR_GX = 0
-ACTOR_GY = 1
-ACTOR_GZ = 2
-ACTOR_PX = 3
-ACTOR_PY = 4
-ACTOR_PZ = 5
-ACTOR_DIR = 6
-ACTOR_MOVING = 7
-ACTOR_I = 8
-global actor_count, actor(), ACTOR_GX, ACTOR_GY, ACTOR_GZ, ACTOR_PX, ACTOR_PY, ACTOR_PZ, ACTOR_DIR, ACTOR_MOVING, ACTOR_I
+dim actor(actor_max, 12)
+
+ACTOR_PLAYER = 0
+
+ACTOR_C_GX = 0
+ACTOR_C_GY = 1
+ACTOR_C_GZ = 2
+ACTOR_D_GX = 3
+ACTOR_D_GY = 4
+ACTOR_D_GZ = 5
+
+ACTOR_PX = 6
+ACTOR_PY = 7
+ACTOR_PZ = 8
+
+ACTOR_DIR = 9
+ACTOR_MOVING = 10
+ACTOR_I = 11
+
+global actor_count, actor()
+global ACTOR_PLAYER
+global ACTOR_C_GX, ACTOR_C_GY, ACTOR_C_GZ
+global ACTOR_D_GX, ACTOR_D_GY, ACTOR_D_GZ
+global ACTOR_PX, ACTOR_PY, ACTOR_PZ
+global ACTOR_DIR, ACTOR_MOVING, ACTOR_I
 
 Rem Direction
 STATIC = 0
@@ -172,15 +186,22 @@ Rem ** Actors **
 
 Procedure _ADD_ACTOR [gx, gy, gz, px, py, pz, i]
 
-    actor(actor_count, ACTOR_GX) = gx
-    actor(actor_count, ACTOR_GY) = gy
-    actor(actor_count, ACTOR_GZ) = gz
+    actor(actor_count, ACTOR_C_GX) = gx
+    actor(actor_count, ACTOR_C_GY) = gy
+    actor(actor_count, ACTOR_C_GZ) = gz
+
+    actor(actor_count, ACTOR_D_GX) = gx
+    actor(actor_count, ACTOR_D_GY) = gy
+    actor(actor_count, ACTOR_D_GZ) = gz
+
     actor(actor_count, ACTOR_PX) = px
     actor(actor_count, ACTOR_PY) = py
     actor(actor_count, ACTOR_PZ) = pz
+
     actor(actor_count, ACTOR_DIR) = 0
     actor(actor_count, ACTOR_MOVING) = 0
     actor(actor_count, ACTOR_I) = i
+
     actor_count = actor_count + 1
 
     _ISO_TO_X[gx, gy, gz, px, py, pz, MAP_SCREEN_X]
@@ -196,59 +217,42 @@ Procedure _UPDATE_ACTORS
     
     if (actor_count > 0)
         For n = 0 To actor_count - 1
-            gx = actor(n, ACTOR_GX)
-            gy = actor(n, ACTOR_GY)
-            gz = actor(n, ACTOR_GZ)
+
+            gx_c = actor(n, ACTOR_C_GX)
+            gy_c = actor(n, ACTOR_C_GY)
+            gz_c = actor(n, ACTOR_C_GZ)
+
+            gx_d = actor(n, ACTOR_D_GX)
+            gy_d = actor(n, ACTOR_D_GY)
+            gz_d = actor(n, ACTOR_D_GZ)
+
             px = actor(n, ACTOR_PX)
             py = actor(n, ACTOR_PY)
             pz = actor(n, ACTOR_PZ)
+
             d = actor(n, ACTOR_DIR)
             m = actor(n, ACTOR_MOVING)
             i = actor(n, ACTOR_I)
 
-            if d = NORTH
-                actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) - 1
-                if actor(n, ACTOR_PZ) < -6
-                    actor(n, ACTOR_PZ) = 0
-                    actor(n, ACTOR_GZ) = actor(n, ACTOR_GZ) - 1
-                    actor(n, ACTOR_DIR) = STATIC
-                    actor(n, ACTOR_MOVING) = 0
-                end if
-            end if
-
-            if d = SOUTH
-                actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) + 1
-                if actor(n, ACTOR_PZ) > 6
-                    actor(n, ACTOR_PZ) = 0
-                    actor(n, ACTOR_GZ) = actor(n, ACTOR_GZ) + 1
-                    actor(n, ACTOR_DIR) = STATIC
-                    actor(n, ACTOR_MOVING) = 0
-                end if
-            end if
-
-            if d = EAST
-                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) + 1
-                if actor(n, ACTOR_PX) > 6
-                    actor(n, ACTOR_PX) = 0
-                    actor(n, ACTOR_GX) = actor(n, ACTOR_GX) + 1
-                    actor(n, ACTOR_DIR) = STATIC
-                    actor(n, ACTOR_MOVING) = 0
-                end if
-            end if
-
-            if d = WEST
+            if (actor(n, ACTOR_D_GX) < actor(n, ACTOR_C_GX))
                 actor(n, ACTOR_PX) = actor(n, ACTOR_PX) - 1
-                if actor(n, ACTOR_PX) < -6
+                if (actor(n, ACTOR_PX) < -6)
+                    actor(n, ACTOR_C_GX) = actor(n, ACTOR_C_GX) - 1
                     actor(n, ACTOR_PX) = 0
-                    actor(n, ACTOR_GX) = actor(n, ACTOR_GX) - 1
-                    actor(n, ACTOR_DIR) = STATIC
-                    actor(n, ACTOR_MOVING) = 0
                 end if
             end if
 
-            _ISO_TO_X[gx, gy, gz, px, py, pz, MAP_SCREEN_X]
+            if (actor(n, ACTOR_D_GX) > actor(n, ACTOR_C_GX))
+                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) + 1
+                if (actor(n, ACTOR_PX) > 6)
+                    actor(n, ACTOR_C_GX) = actor(n, ACTOR_C_GX) + 1
+                    actor(n, ACTOR_PX) = 0
+                end if
+            end if
+
+            _ISO_TO_X[gx_c, gy_c, gz_c, px, py, pz, MAP_SCREEN_X]
             xx = param
-            _ISO_TO_Y[gx, gy, gz, px, py, pz, MAP_SCREEN_Y]
+            _ISO_TO_Y[gx_c, gy_c, gz_c, px, py, pz, MAP_SCREEN_Y]
             yy = param
             bob n, xx, yy, i
 
@@ -256,28 +260,36 @@ Procedure _UPDATE_ACTORS
     End If
 End Proc
 
+Procedure _IS_STATIC [n]
+    result = 0
+    if (actor(n, ACTOR_C_GX) = actor(n, ACTOR_D_GX) and actor(n, ACTOR_C_GZ) = actor(n, ACTOR_D_GZ))
+        result = 1
+    end if
+End Proc[result]
+
 Procedure _CONTROL_PLAYER
 
-    if (actor(0, ACTOR_MOVING) = 0)
+    _IS_STATIC[ACTOR_PLAYER]
+    static = param
 
-        if (Key State(KEY_N))
-            actor(0, ACTOR_DIR) = NORTH
-            actor(0, ACTOR_MOVING) = 1
-        end if
+    if (static = 1)
 
-        if (Key State(KEY_S))
-            actor(0, ACTOR_DIR) = SOUTH
-            actor(0, ACTOR_MOVING) = 1
-        end if
+        rem if (Key State(KEY_N))
+        rem     actor(0, ACTOR_DIR) = NORTH
+        rem     actor(0, ACTOR_MOVING) = 1
+        rem end if
+
+        rem if (Key State(KEY_S))
+        rem     actor(0, ACTOR_DIR) = SOUTH
+        rem     actor(0, ACTOR_MOVING) = 1
+        rem end if
 
         if (Key State(KEY_E))
-            actor(0, ACTOR_DIR) = EAST
-            actor(0, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(0, ACTOR_C_GX) + 1
         end if
 
         if (Key State(KEY_W))
-            actor(0, ACTOR_DIR) = WEST
-            actor(0, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(0, ACTOR_C_GX) - 1
         end if
 
     end if
