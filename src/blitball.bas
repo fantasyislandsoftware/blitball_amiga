@@ -18,11 +18,28 @@ MAP_SCREEN_Y = 0
 Dim map(MAP_D, MAP_H, MAP_D, 2)
 global MAP_D, MAP_H, MAP_SCREEN_X, MAP_SCREEN_Y, map()
 
-REM [i], [x, y, z, imageIndex]
+REM [i], [gx, gy, gz, px, py, pz, d, imageIndex]
 actor_max = 100
 actor_count = 0
-dim actor(actor_max, 7)
-global actor_count, actor()
+dim actor(actor_max, 9)
+ACTOR_GX = 0
+ACTOR_GY = 1
+ACTOR_GZ = 2
+ACTOR_PX = 3
+ACTOR_PY = 4
+ACTOR_PZ = 5
+ACTOR_DIR = 6
+ACTOR_MOVING = 7
+ACTOR_I = 8
+global actor_count, actor(), ACTOR_GX, ACTOR_GY, ACTOR_GZ, ACTOR_PX, ACTOR_PY, ACTOR_PZ, ACTOR_DIR, ACTOR_MOVING, ACTOR_I
+
+Rem Direction
+STATIC = 0
+NORTH = 1
+SOUTH = 2
+EAST = 3
+WEST = 4
+global STATIC, NORTH, SOUTH, EAST, WEST
 
 Rem Key definitions
 KEY_N = 17
@@ -40,10 +57,6 @@ global PATH_ROOT$, PATH_ASSETS$, PATH_GFX$, PATH_DATA$
 
 Rem ** Main **
 
-_ADD_ACTOR [8, 0, 8, 0, 0, 0, 2]
-
-cls 0
-
 If BUILD_RESOURCES = 1
     _IMPORT_IMAGES
 Else
@@ -54,10 +67,11 @@ _INIT_MAP
 _INIT_SCREEN
 _RENDER_MAP
 
-print actor_count
+_ADD_ACTOR [4, 0, 4, 0, 0, 0, 2]
 
 While Key State(69) = false
     _CONTROL_PLAYER
+    _UPDATE_ACTORS
     wait vbl
 Wend
 
@@ -157,13 +171,16 @@ End Proc[result]
 Rem ** Actors **
 
 Procedure _ADD_ACTOR [gx, gy, gz, px, py, pz, i]
-    actor(actor_count, 0) = gx
-    actor(actor_count, 1) = gy
-    actor(actor_count, 2) = gz
-    actor(actor_count, 3) = px
-    actor(actor_count, 4) = py
-    actor(actor_count, 5) = pz
-    actor(actor_count, 6) = i
+
+    actor(actor_count, ACTOR_GX) = gx
+    actor(actor_count, ACTOR_GY) = gy
+    actor(actor_count, ACTOR_GZ) = gz
+    actor(actor_count, ACTOR_PX) = px
+    actor(actor_count, ACTOR_PY) = py
+    actor(actor_count, ACTOR_PZ) = pz
+    actor(actor_count, ACTOR_DIR) = 0
+    actor(actor_count, ACTOR_MOVING) = 0
+    actor(actor_count, ACTOR_I) = i
     actor_count = actor_count + 1
 
     _ISO_TO_X[gx, gy, gz, px, py, pz, MAP_SCREEN_X]
@@ -171,11 +188,99 @@ Procedure _ADD_ACTOR [gx, gy, gz, px, py, pz, i]
     _ISO_TO_Y[gx, gy, gz, px, py, pz, MAP_SCREEN_Y]
     yy = param
 
-    bob actor_count, xx, yy, i
+    bob actor_count - 1, xx, yy, i
 
 End Proc
 
+Procedure _UPDATE_ACTORS
+    
+    if (actor_count > 0)
+        For n = 0 To actor_count - 1
+            gx = actor(n, ACTOR_GX)
+            gy = actor(n, ACTOR_GY)
+            gz = actor(n, ACTOR_GZ)
+            px = actor(n, ACTOR_PX)
+            py = actor(n, ACTOR_PY)
+            pz = actor(n, ACTOR_PZ)
+            d = actor(n, ACTOR_DIR)
+            m = actor(n, ACTOR_MOVING)
+            i = actor(n, ACTOR_I)
+
+            if d = NORTH and m = 1
+                actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) - 1
+                if actor(n, ACTOR_PZ) < -6
+                    actor(n, ACTOR_PZ) = 0
+                    actor(n, ACTOR_GZ) = actor(n, ACTOR_GZ) - 1
+                    actor(n, ACTOR_DIR) = STATIC
+                    actor(n, ACTOR_MOVING) = 0
+                end if
+            end if
+
+            if d = SOUTH and m = 1
+                actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) + 1
+                if actor(n, ACTOR_PZ) > 6
+                    actor(n, ACTOR_PZ) = 0
+                    actor(n, ACTOR_GZ) = actor(n, ACTOR_GZ) + 1
+                    actor(n, ACTOR_DIR) = STATIC
+                    actor(n, ACTOR_MOVING) = 0
+                end if
+            end if
+
+            if d = EAST and m = 1
+                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) + 1
+                if actor(n, ACTOR_PX) > 6
+                    actor(n, ACTOR_PX) = 0
+                    actor(n, ACTOR_GX) = actor(n, ACTOR_GX) + 1
+                    actor(n, ACTOR_DIR) = STATIC
+                    actor(n, ACTOR_MOVING) = 0
+                end if
+            end if
+
+            if d = WEST and m = 1
+                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) - 1
+                if actor(n, ACTOR_PX) < -6
+                    actor(n, ACTOR_PX) = 0
+                    actor(n, ACTOR_GX) = actor(n, ACTOR_GX) - 1
+                    actor(n, ACTOR_DIR) = STATIC
+                    actor(n, ACTOR_MOVING) = 0
+                end if
+            end if
+
+            _ISO_TO_X[gx, gy, gz, px, py, pz, MAP_SCREEN_X]
+            xx = param
+            _ISO_TO_Y[gx, gy, gz, px, py, pz, MAP_SCREEN_Y]
+            yy = param
+            bob n, xx, yy, i
+
+        Next n
+    End If
+End Proc
+
 Procedure _CONTROL_PLAYER
+
+    if (Key State(KEY_N))
+        actor(0, ACTOR_DIR) = NORTH
+        actor(0, ACTOR_MOVING) = 1
+    end if
+
+    if (Key State(KEY_S))
+        actor(0, ACTOR_DIR) = SOUTH
+        actor(0, ACTOR_MOVING) = 1
+    end if
+
+    if (Key State(KEY_E))
+        actor(0, ACTOR_DIR) = EAST
+        actor(0, ACTOR_MOVING) = 1
+    end if
+
+    if (Key State(KEY_W))
+        actor(0, ACTOR_DIR) = WEST
+        actor(0, ACTOR_MOVING) = 1
+    end if
+
+End Proc
+
+Procedure _CONTROL_PLAYER2
 
     gx = actor(0, 0)
     gy = actor(0, 1)
@@ -250,12 +355,6 @@ Procedure _RENDER_ACTORS
         xx = param
         _ISO_TO_Y[gx, gy, gz, px, py, pz, MAP_SCREEN_Y]
         yy = param
-
-        rem _ISO_TO_X[gx + 1, gy, gz, px, py, pz, MAP_SCREEN_X]
-        rem xxx = param
-        rem _ISO_TO_Y[gx + 1, gy, gz, px, py, pz, MAP_SCREEN_Y]
-        rem yyy = param
-
 
         bob n, xx, yy, i
 
