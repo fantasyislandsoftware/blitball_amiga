@@ -206,7 +206,7 @@ Procedure _UPDATE_ACTORS
             m = actor(n, ACTOR_MOVING)
             i = actor(n, ACTOR_I)
 
-            if d = NORTH and m = 1
+            if d = NORTH
                 actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) - 1
                 if actor(n, ACTOR_PZ) < -6
                     actor(n, ACTOR_PZ) = 0
@@ -216,7 +216,7 @@ Procedure _UPDATE_ACTORS
                 end if
             end if
 
-            if d = SOUTH and m = 1
+            if d = SOUTH
                 actor(n, ACTOR_PZ) = actor(n, ACTOR_PZ) + 1
                 if actor(n, ACTOR_PZ) > 6
                     actor(n, ACTOR_PZ) = 0
@@ -226,7 +226,7 @@ Procedure _UPDATE_ACTORS
                 end if
             end if
 
-            if d = EAST and m = 1
+            if d = EAST
                 actor(n, ACTOR_PX) = actor(n, ACTOR_PX) + 1
                 if actor(n, ACTOR_PX) > 6
                     actor(n, ACTOR_PX) = 0
@@ -236,7 +236,7 @@ Procedure _UPDATE_ACTORS
                 end if
             end if
 
-            if d = WEST and m = 1
+            if d = WEST
                 actor(n, ACTOR_PX) = actor(n, ACTOR_PX) - 1
                 if actor(n, ACTOR_PX) < -6
                     actor(n, ACTOR_PX) = 0
@@ -258,24 +258,28 @@ End Proc
 
 Procedure _CONTROL_PLAYER
 
-    if (Key State(KEY_N))
-        actor(0, ACTOR_DIR) = NORTH
-        actor(0, ACTOR_MOVING) = 1
-    end if
+    if (actor(0, ACTOR_MOVING) = 0)
 
-    if (Key State(KEY_S))
-        actor(0, ACTOR_DIR) = SOUTH
-        actor(0, ACTOR_MOVING) = 1
-    end if
+        if (Key State(KEY_N))
+            actor(0, ACTOR_DIR) = NORTH
+            actor(0, ACTOR_MOVING) = 1
+        end if
 
-    if (Key State(KEY_E))
-        actor(0, ACTOR_DIR) = EAST
-        actor(0, ACTOR_MOVING) = 1
-    end if
+        if (Key State(KEY_S))
+            actor(0, ACTOR_DIR) = SOUTH
+            actor(0, ACTOR_MOVING) = 1
+        end if
 
-    if (Key State(KEY_W))
-        actor(0, ACTOR_DIR) = WEST
-        actor(0, ACTOR_MOVING) = 1
+        if (Key State(KEY_E))
+            actor(0, ACTOR_DIR) = EAST
+            actor(0, ACTOR_MOVING) = 1
+        end if
+
+        if (Key State(KEY_W))
+            actor(0, ACTOR_DIR) = WEST
+            actor(0, ACTOR_MOVING) = 1
+        end if
+
     end if
 
 End Proc
