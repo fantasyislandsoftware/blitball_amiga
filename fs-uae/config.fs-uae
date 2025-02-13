@@ -1,6 +1,6 @@
 [fs-uae]
 amiga_model = A1200
-chip_memory = 8192
+chip_memory = 2048
 cpu = 68040
 floppy_drive_0_sounds = off
 floppy_drive_speed = 0
