@@ -218,13 +218,13 @@ Procedure _UPDATE_ACTORS
     if (actor_count > 0)
         For n = 0 To actor_count - 1
 
-            gx_c = actor(n, ACTOR_C_GX)
-            gy_c = actor(n, ACTOR_C_GY)
-            gz_c = actor(n, ACTOR_C_GZ)
+            c_gx = actor(n, ACTOR_C_GX)
+            c_gy = actor(n, ACTOR_C_GY)
+            c_gz = actor(n, ACTOR_C_GZ)
 
-            gx_d = actor(n, ACTOR_D_GX)
-            gy_d = actor(n, ACTOR_D_GY)
-            gz_d = actor(n, ACTOR_D_GZ)
+            d_gx = actor(n, ACTOR_D_GX)
+            d_gy = actor(n, ACTOR_D_GY)
+            d_gz = actor(n, ACTOR_D_GZ)
 
             px = actor(n, ACTOR_PX)
             py = actor(n, ACTOR_PY)
@@ -234,27 +234,64 @@ Procedure _UPDATE_ACTORS
             m = actor(n, ACTOR_MOVING)
             i = actor(n, ACTOR_I)
 
-            if (actor(n, ACTOR_D_GX) < actor(n, ACTOR_C_GX))
-                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) - 1
-                if (actor(n, ACTOR_PX) < -6)
-                    actor(n, ACTOR_C_GX) = actor(n, ACTOR_C_GX) - 1
-                    actor(n, ACTOR_PX) = 0
+            Rem ** NORTH **
+            if (d_gz < c_gz)
+                pz = pz - 1
+                if (pz < -6)
+                    c_gz = c_gz - 1
+                    pz = 0
+                    m = 0
                 end if
             end if
 
-            if (actor(n, ACTOR_D_GX) > actor(n, ACTOR_C_GX))
-                actor(n, ACTOR_PX) = actor(n, ACTOR_PX) + 1
-                if (actor(n, ACTOR_PX) > 6)
-                    actor(n, ACTOR_C_GX) = actor(n, ACTOR_C_GX) + 1
-                    actor(n, ACTOR_PX) = 0
+            Rem ** SOUTH **
+            if (d_gz > c_gz)
+                pz = pz + 1
+                if (pz > 6)
+                    c_gz = c_gz + 1
+                    pz = 0
+                    m = 0
                 end if
             end if
 
-            _ISO_TO_X[gx_c, gy_c, gz_c, px, py, pz, MAP_SCREEN_X]
+            Rem ** WEST **
+            if (d_gx < c_gx)
+                px = px - 1
+                if (px < -6)
+                    c_gx = c_gx - 1
+                    px = 0
+                    m = 0
+                end if
+            end if
+
+            Rem ** EAST **
+            if (d_gx > c_gx)
+                px = px + 1
+                if (px > 6)
+                    c_gx = c_gx + 1
+                    px = 0
+                    m = 0
+                end if
+            end if
+
+             _ISO_TO_X[c_gx, c_gy, c_gz, px, py, pz, MAP_SCREEN_X]
             xx = param
-            _ISO_TO_Y[gx_c, gy_c, gz_c, px, py, pz, MAP_SCREEN_Y]
+            _ISO_TO_Y[c_gx, c_gy, c_gz, px, py, pz, MAP_SCREEN_Y]
             yy = param
             bob n, xx, yy, i
+
+            actor(n, ACTOR_C_GX) = c_gx
+            actor(n, ACTOR_C_GY) = c_gy
+            actor(n, ACTOR_C_GZ) = c_gz
+            actor(n, ACTOR_D_GX) = d_gx
+            actor(n, ACTOR_D_GY) = d_gy
+            actor(n, ACTOR_D_GZ) = d_gz
+            actor(n, ACTOR_PX) = px
+            actor(n, ACTOR_PY) = py
+            actor(n, ACTOR_PZ) = pz
+            actor(n, ACTOR_DIR) = d
+            actor(n, ACTOR_MOVING) = m
+            actor(n, ACTOR_I) = i
 
         Next n
     End If
@@ -274,22 +311,24 @@ Procedure _CONTROL_PLAYER
 
     if (static = 1)
 
-        rem if (Key State(KEY_N))
-        rem     actor(0, ACTOR_DIR) = NORTH
-        rem     actor(0, ACTOR_MOVING) = 1
-        rem end if
-
-        rem if (Key State(KEY_S))
-        rem     actor(0, ACTOR_DIR) = SOUTH
-        rem     actor(0, ACTOR_MOVING) = 1
-        rem end if
-
-        if (Key State(KEY_E))
-            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(0, ACTOR_C_GX) + 1
+        if (Key State(KEY_N) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+            actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) - 1
+            actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
         end if
 
-        if (Key State(KEY_W))
-            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(0, ACTOR_C_GX) - 1
+        if (Key State(KEY_S) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+            actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) + 1
+            actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+        end if
+
+        if (Key State(KEY_E) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) + 1
+            actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+        end if
+
+        if (Key State(KEY_W) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+            actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) - 1
+            actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
         end if
 
     end if
