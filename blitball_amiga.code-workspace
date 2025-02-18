@@ -11,6 +11,9 @@
 		},
 		{
 			"path": "../../dreamfactory/frontend"
+		},
+		{
+			"path": "src/assets/gfx/3d"
 		}
 	]
 }

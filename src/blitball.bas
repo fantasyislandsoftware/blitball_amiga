@@ -69,6 +69,11 @@ PATH_GFX$ = PATH_ASSETS$ + "gfx/"
 PATH_DATA$ = PATH_ASSETS$ + "data/"
 global PATH_ROOT$, PATH_ASSETS$, PATH_GFX$, PATH_DATA$
 
+dim test(5,30,30)
+test(0,0,0) = 1
+test(1,1,1) = 1
+global test()
+
 Rem ** Main **
 
 If BUILD_RESOURCES = 1
@@ -77,15 +82,15 @@ Else
     load PATH_DATA$ + "images.abk", 1
 End If
 
-_INIT_MAP
-_INIT_SCREEN
-_RENDER_MAP
+rem _INIT_MAP
+rem _INIT_SCREEN
+rem _RENDER_MAP
 
-_ADD_ACTOR [4, 0, 4, 0, 0, 0, 2]
+rem _ADD_ACTOR [4, 0, 4, 0, 0, 0, 2]
 
 While Key State(69) = false
-    _CONTROL_PLAYER
-    _UPDATE_ACTORS
+    rem _CONTROL_PLAYER
+    rem _UPDATE_ACTORS
     wait vbl
 Wend
 
@@ -95,12 +100,14 @@ Procedure _IMPORT_IMAGES
     
     Rem ** 30x30 Images **
     Load Iff PATH_GFX$ + "30x30.iff",0
-    screen Hide 0
+    rem screen Hide 0
+    
     x = 1
     xx = 0
     y = 1
     i = 1
     o = 3
+
     For n = 0 to IMAGE_COUNT- 1
         Get Bob i, x, y To x + IMAGE_SIZE, y + IMAGE_SIZE
         i = i + 1
@@ -113,7 +120,35 @@ Procedure _IMPORT_IMAGES
         EndIf
     Next n
 
-    Screen Close 0
+    x = 1
+    xx = 0
+    y = 1
+    i = 1
+    o = 3
+
+    y = y + (IMAGE_SIZE + o) * 4
+
+    for n = 0 to 4
+
+        paste bob x, y, 9
+
+        for sx = 0 to 29
+            for sy = 0 to 29
+                p = test(n, sx, sy)
+                if (p = 1) then plot x + sx, y + sy, 1
+            next sy
+        next sx
+        
+        xx = xx + 1
+        x = x + IMAGE_SIZE + o
+        If (xx = 8)
+            xx = 0
+            x = 1
+            y = y + IMAGE_SIZE + o
+        EndIf
+    next n
+
+    rem Screen Close 0
     save PATH_DATA$ + "images.abk", 1
 
 End Proc
