@@ -29,6 +29,7 @@ var material = new MeshBasicMaterial({ map: tex });
 
 const sphere = new Mesh(new SphereGeometry(5, 32, 32), material);
 sphere.position.set(0, 0, 0);
+sphere.scale.set(0.8, 0.8, 0.8);
 //sphere.rotation.set(Math.degToRad(0), Math.degToRad(0), Math.degToRad(0));
 world.addToScene(sphere);
 
@@ -37,9 +38,14 @@ cube.position.set(0, 0, 0);
 cube.rotation.set(0, 0, 0);
 world.addToScene(cube);*/
 
-let v = 45 / 2;
-let r = -150;
+const v = 45 / 2;
+
+let r = -90 - 45 + (v * 8);
 let f = 0;
+let n = 0;
+let data = "";
+
+sphere.rotation.set(Math.degToRad(r), Math.degToRad(0), Math.degToRad(0));
 
 const getFrame = () => {
   const gl = vpm.renderer.getContext();
@@ -57,21 +63,26 @@ const getFrame = () => {
   );
   //console.log(pixels);
   for (let i = 0; i < pixels.length; i += 4) {
+    let p = 0;
     if (pixels[i] > 0) {
-      console.log("hit");
+      p = 1;
     }
+    data = data + "a" + p + String.fromCharCode(13) + String.fromCharCode(10);
   }
 };
 
-let x = setInterval(() => {
+/*let x = setInterval(() => {
   sphere.rotation.set(Math.degToRad(r), Math.degToRad(0), Math.degToRad(0));
-  if (r > 90) {
+  n = n + 1;
+  if (r > 180) {
+    r = 0;
+    console.log(n);
     clearInterval(x);
+    localStorage.setItem("data", data);
   }
   getFrame();
-  //console.log(pixels);
-  r = r + 4;
-  f = v + v;
-}, 1000 / 10);
+  console.log(pixels);
+  r = r + 45 / 2;
+}, 1000 / 10);*/
 
 vpm.registerRenderCallback(() => {});

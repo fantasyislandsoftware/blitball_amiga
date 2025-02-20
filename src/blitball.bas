@@ -69,11 +69,6 @@ PATH_GFX$ = PATH_ASSETS$ + "gfx/"
 PATH_DATA$ = PATH_ASSETS$ + "data/"
 global PATH_ROOT$, PATH_ASSETS$, PATH_GFX$, PATH_DATA$
 
-dim test(5,30,30)
-test(0,0,0) = 1
-test(1,1,1) = 1
-global test()
-
 Rem ** Main **
 
 If BUILD_RESOURCES = 1
@@ -82,15 +77,15 @@ Else
     load PATH_DATA$ + "images.abk", 1
 End If
 
-rem _INIT_MAP
-rem _INIT_SCREEN
-rem _RENDER_MAP
+_INIT_MAP
+_INIT_SCREEN
+_RENDER_MAP
 
-rem _ADD_ACTOR [4, 0, 4, 0, 0, 0, 2]
+_ADD_ACTOR [4, 0, 4, 0, 0, 0, 17]
 
 While Key State(69) = false
-    rem _CONTROL_PLAYER
-    rem _UPDATE_ACTORS
+    _CONTROL_PLAYER
+    _UPDATE_ACTORS
     wait vbl
 Wend
 
@@ -119,34 +114,6 @@ Procedure _IMPORT_IMAGES
             y = y + IMAGE_SIZE + o
         EndIf
     Next n
-
-    x = 1
-    xx = 0
-    y = 1
-    i = 1
-    o = 3
-
-    y = y + (IMAGE_SIZE + o) * 4
-
-    for n = 0 to 4
-
-        paste bob x, y, 9
-
-        for sx = 0 to 29
-            for sy = 0 to 29
-                p = test(n, sx, sy)
-                if (p = 1) then plot x + sx, y + sy, 1
-            next sy
-        next sx
-        
-        xx = xx + 1
-        x = x + IMAGE_SIZE + o
-        If (xx = 8)
-            xx = 0
-            x = 1
-            y = y + IMAGE_SIZE + o
-        EndIf
-    next n
 
     rem Screen Close 0
     save PATH_DATA$ + "images.abk", 1
@@ -313,7 +280,7 @@ Procedure _UPDATE_ACTORS
             xx = param
             _ISO_TO_Y[c_gx, c_gy, c_gz, px, py, pz, MAP_SCREEN_Y]
             yy = param
-            bob n, xx, yy, i
+            bob n, xx, yy, i + px
 
             actor(n, ACTOR_C_GX) = c_gx
             actor(n, ACTOR_C_GY) = c_gy
