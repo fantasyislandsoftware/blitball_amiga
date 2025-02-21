@@ -40,12 +40,12 @@ world.addToScene(cube);*/
 
 const v = 45 / 2;
 
-let r = -90 - 45 + (v * 8);
+let r = -90 - 45 + (v * 7);
 let f = 0;
 let n = 0;
 let data = "";
 
-sphere.rotation.set(Math.degToRad(r), Math.degToRad(0), Math.degToRad(0));
+sphere.rotation.set(Math.degToRad(r), Math.degToRad(0), Math.degToRad(180));
 
 const getFrame = () => {
   const gl = vpm.renderer.getContext();

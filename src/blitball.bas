@@ -7,7 +7,7 @@ BUILD_RESOURCES = 1
 
 Rem Image
 IMAGE_SIZE = 30
-IMAGE_COUNT = 45
+IMAGE_COUNT = 64
 global IMAGE_SIZE, IMAGE_COUNT
 
 Rem Map
@@ -81,7 +81,7 @@ _INIT_MAP
 _INIT_SCREEN
 _RENDER_MAP
 
-_ADD_ACTOR [4, 0, 4, 0, 0, 0, 17]
+_ADD_ACTOR [4, 0, 4, 0, 0, 0, 33]
 
 While Key State(69) = false
     _CONTROL_PLAYER
@@ -280,7 +280,26 @@ Procedure _UPDATE_ACTORS
             xx = param
             _ISO_TO_Y[c_gx, c_gy, c_gz, px, py, pz, MAP_SCREEN_Y]
             yy = param
-            bob n, xx, yy, i + px
+
+            _pi = i
+
+            if (d = EAST)
+                _pi = i + px
+            end if
+
+            if (d = WEST)
+                _pi = i + px + 24
+            end if
+
+            if (d = NORTH)
+                _pi = i + pz + 16
+            end if
+
+            if (d = SOUTH)
+                _pi = i + pz + 8
+            end if
+
+            bob n, xx, yy, _pi
 
             actor(n, ACTOR_C_GX) = c_gx
             actor(n, ACTOR_C_GY) = c_gy
@@ -316,21 +335,25 @@ Procedure _CONTROL_PLAYER
         if (Key State(KEY_N) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
             actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) - 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_DIR) = NORTH
         end if
 
         if (Key State(KEY_S) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
             actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) + 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_DIR) = SOUTH
         end if
 
         if (Key State(KEY_E) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
             actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) + 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_DIR) = EAST
         end if
 
         if (Key State(KEY_W) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
             actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) - 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
+            actor(ACTOR_PLAYER, ACTOR_DIR) = WEST
         end if
 
     end if
