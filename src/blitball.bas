@@ -87,6 +87,7 @@ While Key State(69) = false
     _CONTROL_PLAYER
     _UPDATE_ACTORS
     wait vbl
+    rem wait 5
 Wend
 
 Rem ** File I/O **
@@ -288,11 +289,11 @@ Procedure _UPDATE_ACTORS
             end if
 
             if (d = WEST)
-                _pi = i + px + 24
+                _pi = i + -px + 24
             end if
 
             if (d = NORTH)
-                _pi = i + pz + 16
+                _pi = i + -pz + 16
             end if
 
             if (d = SOUTH)
@@ -357,65 +358,6 @@ Procedure _CONTROL_PLAYER
         end if
 
     end if
-
-End Proc
-
-Procedure _CONTROL_PLAYER2
-
-    gx = actor(0, 0)
-    gy = actor(0, 1)
-    gz = actor(0, 2)
-    px = actor(0, 3)
-    py = actor(0, 4)
-    pz = actor(0, 5)
-
-    _DETECT_WALL[gx, gy, gz - 1]
-    n = param
-    _DETECT_WALL[gx, gy, gz + 1]
-    s = param
-    _DETECT_WALL[gx + 1, gy, gz]
-    e = param
-    _DETECT_WALL[gx - 1, gy, gz]
-    w = param
-
-    If (Key State(KEY_N) and n = 0) Then pz = pz - 1
-    If (Key State(KEY_S) and s = 0) Then pz = pz + 1
-    If (Key State(KEY_W) and w = 0) Then px = px - 1
-    If (Key State(KEY_E) and e = 0) Then px = px + 1
-
-    if (px > 6)
-        gx = gx + 1
-        px = 0
-    end if
-
-    if (pz > 6)
-        gz = gz + 1
-        pz = 0
-    end if
-
-    if (px < -6)
-        gx = gx - 1
-        px = 0
-    end if
-
-    if (pz < -6)
-        gz = gz - 1
-        pz = 0
-    end if
-    
-    actor(0, 0) = gx
-    actor(0, 1) = gy
-    actor(0, 2) = gz
-    actor(0, 3) = px
-    actor(0, 4) = py
-    actor(0, 5) = pz
-
-    _ISO_TO_X[gx, gy, gz, px, py, pz, MAP_SCREEN_X]
-    xx = param
-    _ISO_TO_Y[gx, gy, gz, px, py, pz, MAP_SCREEN_Y]
-    yy = param
-
-    bob 0, xx, yy, 2
 
 End Proc
 

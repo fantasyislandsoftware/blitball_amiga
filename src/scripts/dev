@@ -2,4 +2,4 @@ delete dh1:blitball
 apcmp dh1:blitball.bas
 dh1:blitball
 
-;dh0:apps/dpaint4/dpaint
+dh0:apps/dpaint4/dpaint
