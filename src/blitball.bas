@@ -11,12 +11,29 @@ IMAGE_COUNT = 64
 global IMAGE_SIZE, IMAGE_COUNT
 
 Rem Map
-MAP_D = 10
-MAP_H = 2
-MAP_SCREEN_X = 140
-MAP_SCREEN_Y = 0
+MAP_D = 12
+MAP_H = 3
+MAP_SCREEN_X = 144
+MAP_SCREEN_Y = 30
 Dim map(MAP_D, MAP_H, MAP_D, 2)
+
+Rem Map Block Behaviours
+MAP_B_AIR = 0
+MAP_B_SOLID = 1
+
+Rem Map Block Images
+MAP_I_NONE = 0
+MAP_I_GRID_FLOOR = 1
+MAP_I_TRANS_CUBE = 9
+MAP_I_GRID_WALL_WEST_LEFT = 10
+MAP_I_GRID_WALL_WEST_TOP = 11
+MAP_I_GRID_WALL_WEST_TOP_LEFT = 12
+MAP_I_GRID_WALL_WEST_RIGHT = 14
+
 global MAP_D, MAP_H, MAP_SCREEN_X, MAP_SCREEN_Y, map()
+global MAP_B_AIR, MAP_B_SOLID
+global MAP_I_GRID_FLOOR, MAP_I_TRANS_CUBE
+global MAP_I_GRID_WALL_WEST_LEFT, MAP_I_GRID_WALL_WEST_TOP, MAP_I_GRID_WALL_WEST_TOP_LEFT, MAP_I_GRID_WALL_WEST_RIGHT
 
 REM [i], [gx, gy, gz, px, py, pz, d, imageIndex]
 actor_max = 100
@@ -138,12 +155,45 @@ End Proc
 Rem ** Map **
 
 Procedure _INIT_MAP
+    Rem Floor
     For z = 0 To MAP_D - 1
         For x = 0 to MAP_D - 1
-            map(x, 0, z, 0) = 1
-            map(x, 0, z, 1) = 0
+            _SET_MAP_BLOCK [x, 0, z, MAP_I_GRID_FLOOR, MAP_B_AIR]
         Next x
     Next z
+    for n = 0 to MAP_D - 1
+        rem _SET_MAP_BLOCK [0, 0, n, MAP_I_TRANS_CUBE, MAP_B_SOLID]
+        rem _SET_MAP_BLOCK [11, 0, n, MAP_I_TRANS_CUBE, MAP_B_SOLID]
+        rem _SET_MAP_BLOCK [n, 0, 0, MAP_I_TRANS_CUBE, MAP_B_SOLID]
+        rem _SET_MAP_BLOCK [n, 0, 11, MAP_I_TRANS_CUBE, MAP_B_SOLID]
+    next n
+
+    rem _SET_MAP_BLOCK [0, 0, 11, MAP_I_GRID_WALL_WEST_LEFT, MAP_B_SOLID]
+    rem _SET_MAP_BLOCK [0, 1, 11, MAP_I_GRID_WALL_WEST_LEFT, MAP_B_SOLID]
+    rem _SET_MAP_BLOCK [0, 2, 11, MAP_I_GRID_WALL_WEST_TOP_LEFT, MAP_B_SOLID]
+    rem _SET_MAP_BLOCK [0, 2, 10, MAP_I_GRID_WALL_WEST_TOP, MAP_B_SOLID]
+
+    _ADD_WEST_WALL [0, 0, 11, 12, 3]
+
+End Proc
+
+Procedure _ADD_WEST_WALL [x, y, z, w, h]
+    Rem Initial set to no image with solid behaviour
+    for yy = 0 to h - 1
+        for zz = z - (w - 1) to z
+            _SET_MAP_BLOCK [x, yy, zz, MAP_I_NONE, MAP_B_SOLID]
+        next zz
+    next yy
+    Rem Left Wall
+    for yy = 0 to h - 1
+        _SET_MAP_BLOCK [x, yy, z, MAP_I_GRID_WALL_WEST_LEFT, MAP_B_SOLID]
+        _SET_MAP_BLOCK [x, yy, z - (w - 1), MAP_I_GRID_WALL_WEST_RIGHT, MAP_B_SOLID]
+    next yy
+End Proc
+
+Procedure _SET_MAP_BLOCK [x, y, z, i, b]
+    map(x, y, z, 0) = i
+    map(x, y, z, 1) = b
 End Proc
 
 Procedure _RENDER_MAP
@@ -326,32 +376,59 @@ Procedure _IS_STATIC [n]
     end if
 End Proc[result]
 
+Procedure _IS_SOLID [x, y, z]
+    result = 0
+    if (x < 0)
+        x = 0
+    end if
+    if (map(x, y, z, 1) = MAP_B_SOLID)
+        result = 1
+    end if
+End Proc[result]
+
 Procedure _CONTROL_PLAYER
 
     _IS_STATIC[ACTOR_PLAYER]
     static = param
 
+    gx = actor(ACTOR_PLAYER, ACTOR_D_GX)
+    gy = actor(ACTOR_PLAYER, ACTOR_D_GY)
+    gz = actor(ACTOR_PLAYER, ACTOR_D_GZ)
+    m = actor(ACTOR_PLAYER, ACTOR_MOVING)
+
+    _IS_SOLID[gx, gy, gz - 1]
+    is_solid_north = param
+
+    _IS_SOLID[gx, gy, gz + 1]
+    is_solid_south = param
+
+    _IS_SOLID[gx + 1, gy, gz]
+    is_solid_east = param
+
+    _IS_SOLID[gx - 1, gy, gz]
+    is_solid_west = param
+
     if (static = 1)
 
-        if (Key State(KEY_N) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+        if ((Key State(KEY_N)) and (m = false) and (is_solid_north = false))
             actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) - 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
             actor(ACTOR_PLAYER, ACTOR_DIR) = NORTH
         end if
 
-        if (Key State(KEY_S) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+        if (Key State(KEY_S) and (m = false) and (is_solid_south = false))
             actor(ACTOR_PLAYER, ACTOR_D_GZ) = actor(ACTOR_PLAYER, ACTOR_C_GZ) + 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
             actor(ACTOR_PLAYER, ACTOR_DIR) = SOUTH
         end if
 
-        if (Key State(KEY_E) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+        if (Key State(KEY_E) and (m = false) and (is_solid_east = false))
             actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) + 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
             actor(ACTOR_PLAYER, ACTOR_DIR) = EAST
         end if
 
-        if (Key State(KEY_W) and actor(ACTOR_PLAYER, ACTOR_MOVING) = 0)
+        if (Key State(KEY_W) and (m = false) and (is_solid_west = false))
             actor(ACTOR_PLAYER, ACTOR_D_GX) = actor(ACTOR_PLAYER, ACTOR_C_GX) - 1
             actor(ACTOR_PLAYER, ACTOR_MOVING) = 1
             actor(ACTOR_PLAYER, ACTOR_DIR) = WEST
